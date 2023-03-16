@@ -1,0 +1,89 @@
+---
+title: "WebScrap"
+author: "MenaDT"
+date: "2023-03-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Cargo librerías
+```{r}
+library(dplyr)
+library(rvest)
+library(stringr)
+library(XML)
+```
+
+#Url de la página
+
+```{r}
+#En clave pongo lo que voy a buscar.
+clave <- "Martin%20Menalled"
+#Armo la URL con la clave
+buscar <- paste0("https://www.google.com/search?q=",clave)
+buscar <- paste0(buscar,"&hl=es&sxsrf=AJOqlzUjlU4S7ac0woB9jggtP8X65AwAnw%3A1678326283862&source=hp&ei=CzoJZLarMovZ1sQPq-67uAQ&iflsig=AK50M_UAAAAAZAlIG9Covby8TCKSuebw80s7WcYLQOPg&ved=0ahUKEwj23NvP3M39AhWLrJUCHSv3DkcQ4dUDCAk&uact=5&oq=Messi&gs_lcp=Cgdnd3Mtd2l6EAMyBwguELEDEEMyBAgAEEMyBAguEEMyBAgAEEMyBQgAEIAEMgQILhBDMggIABCABBCxAzIFCAAQgAQyBAgAEEMyBQgAEIAEOgcIIxDqAhAnOgQIIxAnOhQILhCABBCxAxCDARDHARDRAxDUAjoLCAAQgAQQsQMQgwE6EQguEIAEELEDEIMBEMcBENEDOgUILhCABDoICC4QgAQQsQM6EwguELEDEIMBEMcBENEDENQCEEM6CggAELEDEIMBEEM6CgguEMcBENEDEENQnQRYyAtg-w5oAXAAeACAAWKIAcMDkgEBNZgBAKABAbABCg&sclient=gws-wiz#imgrc=5HZ2Xnv8Bzfv4M")
+
+#Leo la p[agina]
+tmp <- read_html(buscar,enconding="latin1")
+
+#Me quedo con los links que me interesan
+links <- html_nodes(tmp,"a") %>% html_attr("href")
+links1 <- links[which(substring(links,1,5)=="http:")]
+links2 <- links[which(substring(links,1,6)=="/url?q")]
+
+```
+
+
+```{r}
+n2 <- length(links2)
+for(i in 1:n2)
+{
+links2[i] <- substring(links2[i],8,gregexpr(pattern="&sa",links2[i])[[1]]-1)
+}
+links <- c(links1,links2)
+
+n <- length(links)
+
+docs <- character(0)
+
+for(i in 1:n)
+{
+url <- links[i]
+if(grepl(pattern = "google",url))
+{
+print("salteo")
+} else {
+
+url <- gsub("%25C3%25A1","á",url)
+url <- gsub("%25C3%25A9","é",url)
+url <- gsub("%25C3%25AD","í",url)
+url <- gsub("%25C3%25B3","ó",url)
+url <- gsub("%25C3%25BA","ú",url)
+url <- gsub("%25C3%25B1","ñ",url)
+
+Sys.sleep(runif(1))
+source <- read_html(url)
+nodes <- html_nodes(source,"p")
+if(length(nodes)>0)
+{
+textos <- html_text(nodes)
+docs <- c(docs,textos)
+}
+}
+}
+
+hdocs <- as.data.frame(docs)
+write.csv(hdocs,"documentos.csv")
+
+```
+
+
+
+
+```{r}
+ 
+```
+

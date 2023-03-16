@@ -1,0 +1,41 @@
+---
+title: "scarp3"
+author: "MenaDT"
+date: "2023-03-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Web scrapping desde R
+## https://www.datanalytics.com/libro_r/web-scraping.html
+
+
+## Con rvest
+
+library(rvest)
+url <- c()
+url <- c("MARTIN", "PELOTAS")
+url.ibex <- "https://resultados.as.com/resultados/futbol/primera/clasificacion/?omnil=mpal"
+tmp <- read_html(url.ibex)
+tmp2 <- html_nodes(tmp, "table")
+
+length(tmp2)
+
+sapply(tmp2, class)
+
+
+sapply(tmp2, function(x) dim(html_table(x, fill = TRUE)))
+
+ibex <- html_table(tmp2[[5]])
+
+
+
+## buscar datos 
+
+
+```
+
